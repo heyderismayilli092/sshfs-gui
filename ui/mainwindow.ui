@@ -1,130 +1,215 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Created with Cambalache 0.94.1 -->
 <!-- Created for Cambalache import - sshfs-gui main window -->
 <interface>
+  <!-- interface-name mainwindow.ui -->
   <requires lib="gtk" version="4.0"/>
   <requires lib="libadwaita" version="1.4"/>
-
   <object class="AdwApplicationWindow" id="main_window">
-    <property name="title">SSHFS GUI</property>
-    <property name="default-width">920</property>
-    <property name="default-height">620</property>
-    <property name="width-request">640</property>
-    <property name="height-request">440</property>
     <property name="content">
       <object class="AdwToastOverlay" id="toast_overlay">
         <property name="child">
           <object class="AdwToolbarView" id="toolbar_view">
-
-            <child type="top">
-              <object class="AdwHeaderBar" id="header_bar">
-                <property name="title-widget">
-                  <object class="AdwWindowTitle" id="window_title">
-                    <property name="title">SSHFS GUI</property>
-                    <property name="subtitle">Local/Remote SSH Folder Mounting Tool</property>
-                  </object>
-                </property>
-                <child type="start">
-                  <object class="GtkButton" id="scan_button">
-                    <property name="icon-name">view-refresh-symbolic</property>
-                    <property name="tooltip-text">Scan the SSH devices on the network</property>
-                  </object>
-                </child>
-                <child type="end">
-                  <object class="GtkButton" id="disconnect_button">
-                    <property name="icon-name">media-eject-symbolic</property>
-                    <property name="tooltip-text">Disconnect / Unmount</property>
-                    <property name="sensitive">false</property>
-                  </object>
-                </child>
-              </object>
-            </child>
-
             <property name="content">
               <object class="GtkOverlay" id="main_overlay">
-
+                <!-- ANA İÇERİK -->
                 <property name="child">
                   <object class="GtkBox" id="root_box">
                     <property name="orientation">vertical</property>
-
                     <child>
                       <object class="AdwBanner" id="error_banner">
-                        <property name="title">An error occurred</property>
-                        <property name="button-label">Close</property>
+                        <property name="button-label">Kapat</property>
                         <property name="revealed">false</property>
+                        <property name="title">Bir hata oluştu.</property>
                       </object>
                     </child>
-
                     <child>
                       <object class="GtkPaned" id="main_paned">
                         <property name="orientation">horizontal</property>
-                        <property name="vexpand">true</property>
                         <property name="position">300</property>
-                        <property name="shrink-start-child">false</property>
                         <property name="resize-start-child">false</property>
-
+                        <property name="shrink-start-child">false</property>
+                        <property name="vexpand">true</property>
                         <child>
                           <object class="GtkBox" id="device_panel_box">
                             <property name="orientation">vertical</property>
-                            <property name="width-request">260</property>
+                            <property name="width-request">280</property>
                             <child>
-                              <object class="GtkBox" id="device_panel_header">
-                                <property name="orientation">horizontal</property>
-                                <property name="margin-top">8</property>
-                                <property name="margin-bottom">4</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
+                              <object class="GtkStack" id="sshscan_pages">
+                                <property name="transition-type">crossfade</property>
+                                <property name="vexpand">true</property>
                                 <child>
-                                  <object class="GtkLabel" id="device_panel_title">
-                                    <property name="label">SSH Devices on the Network</property>
-                                    <property name="hexpand">true</property>
-                                    <property name="xalign">0</property>
-                                    <style>
-                                      <class name="heading"/>
-                                    </style>
+                                  <object class="GtkStackPage" id="sshscan_page">
+                                    <property name="child">
+                                      <object class="GtkBox">
+                                        <property name="orientation">vertical</property>
+                                        <child>
+                                          <object class="GtkLabel">
+                                            <property name="halign">fill</property>
+                                            <property name="label">SSH Devices on Local Network</property>
+                                            <property name="margin-bottom">6</property>
+                                            <property name="margin-end">18</property>
+                                            <property name="margin-start">18</property>
+                                            <property name="margin-top">12</property>
+                                            <property name="wrap">true</property>
+                                            <property name="xalign">0</property>
+                                            <style>
+                                              <class name="heading"/>
+                                            </style>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkScrolledWindow" id="device_scrolled">
+                                            <property name="child">
+                                              <object class="GtkListBox" id="device_listbox">
+                                                <property name="selection-mode">single</property>
+                                                <style>
+                                                  <class name="navigation-sidebar"/>
+                                                </style>
+                                              </object>
+                                            </property>
+                                            <property name="hexpand">true</property>
+                                            <property name="hscrollbar-policy">never</property>
+                                            <property name="vexpand">true</property>
+                                          </object>
+                                        </child>
+                                      </object>
+                                    </property>
+                                    <property name="name">sshscan_page</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkStackPage" id="sshscan_page2">
+                                    <property name="child">
+                                      <object class="GtkBox">
+                                        <property name="halign">center</property>
+                                        <property name="margin-end">18</property>
+                                        <property name="margin-start">18</property>
+                                        <property name="orientation">vertical</property>
+                                        <property name="spacing">12</property>
+                                        <property name="valign">center</property>
+                                        <child>
+                                          <object class="AdwSpinner">
+                                            <property name="halign">center</property>
+                                            <property name="height-request">32</property>
+                                            <property name="width-request">32</property>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkLabel">
+                                            <property name="justify">center</property>
+                                            <property name="label">Scanning SSH devices...</property>
+                                            <property name="wrap">true</property>
+                                            <style>
+                                              <class name="dim-label"/>
+                                            </style>
+                                          </object>
+                                        </child>
+                                      </object>
+                                    </property>
+                                    <property name="name">sshscan_page2</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkStackPage" id="connected_folders">
+                                    <property name="child">
+                                      <object class="GtkBox">
+                                        <property name="orientation">vertical</property>
+                                        <child>
+                                          <object class="GtkLabel">
+                                            <property name="halign">fill</property>
+                                            <property name="label">Connected Folders</property>
+                                            <property name="margin-bottom">6</property>
+                                            <property name="margin-end">18</property>
+                                            <property name="margin-start">18</property>
+                                            <property name="margin-top">12</property>
+                                            <property name="wrap">true</property>
+                                            <property name="xalign">0</property>
+                                            <style>
+                                              <class name="heading"/>
+                                            </style>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkScrolledWindow" id="connected_folders_scrolled">
+                                            <property name="child">
+                                              <object class="GtkListBox" id="connected_folders_listbox">
+                                                <property name="selection-mode">single</property>
+                                                <style>
+                                                  <class name="navigation-sidebar"/>
+                                                </style>
+                                              </object>
+                                            </property>
+                                            <property name="hexpand">true</property>
+                                            <property name="hscrollbar-policy">never</property>
+                                            <property name="vexpand">true</property>
+                                          </object>
+                                        </child>
+                                      </object>
+                                    </property>
+                                    <property name="name">connected_folders</property>
                                   </object>
                                 </child>
                               </object>
                             </child>
                             <child>
-                              <object class="GtkScrolledWindow" id="device_scrolled">
-                                <property name="hexpand">true</property>
-                                <property name="vexpand">true</property>
-                                <property name="hscrollbar-policy">never</property>
-                                <property name="child">
-                                  <object class="GtkListBox" id="device_listbox">
-                                    <property name="selection-mode">single</property>
-                                    <style>
-                                      <class name="navigation-sidebar"/>
-                                    </style>
+                              <object class="GtkSeparator"/>
+                            </child>
+                            <child>
+                              <object class="GtkBox" id="panel_switcher_box">
+                                <property name="homogeneous">true</property>
+                                <property name="margin-bottom">8</property>
+                                <property name="margin-end">8</property>
+                                <property name="margin-start">8</property>
+                                <property name="margin-top">8</property>
+                                <property name="orientation">horizontal</property>
+                                <child>
+                                  <object class="GtkToggleButton" id="sshdeviceslist_button">
+                                    <property name="active">true</property>
+                                    <property name="child">
+                                      <object class="AdwButtonContent">
+                                        <property name="icon-name">network-server-symbolic</property>
+                                        <property name="label">Devices</property>
+                                      </object>
+                                    </property>
+                                    <property name="tooltip-text">Scan SSH devices on local network</property>
                                   </object>
-                                </property>
+                                </child>
+                                <child>
+                                  <object class="GtkToggleButton" id="connectedfolders_button">
+                                    <property name="child">
+                                      <object class="AdwButtonContent">
+                                        <property name="icon-name">folder-remote-symbolic</property>
+                                        <property name="label">Folders</property>
+                                      </object>
+                                    </property>
+                                    <property name="group">sshdeviceslist_button</property>
+                                    <property name="tooltip-text">Connected folders</property>
+                                  </object>
+                                </child>
+                                <style>
+                                  <class name="linked"/>
+                                </style>
                               </object>
                             </child>
                           </object>
                         </child>
-
                         <child>
                           <object class="GtkScrolledWindow" id="form_scrolled">
-                            <property name="hexpand">true</property>
-                            <property name="vexpand">true</property>
                             <property name="child">
                               <object class="AdwClamp" id="form_clamp">
-                                <property name="maximum-size">560</property>
-                                <property name="tightening-threshold">400</property>
                                 <property name="child">
                                   <object class="GtkBox" id="form_box">
+                                    <property name="margin-bottom">24</property>
+                                    <property name="margin-end">12</property>
+                                    <property name="margin-start">12</property>
+                                    <property name="margin-top">24</property>
                                     <property name="orientation">vertical</property>
                                     <property name="spacing">18</property>
-                                    <property name="margin-top">24</property>
-                                    <property name="margin-bottom">24</property>
-                                    <property name="margin-start">12</property>
-                                    <property name="margin-end">12</property>
-
                                     <child>
                                       <object class="AdwPreferencesGroup" id="connection_group">
-                                        <property name="title">Connection Information</property>
                                         <property name="description">The selected device is filled in automatically; edit if necessary</property>
-
+                                        <property name="title">Connection Information</property>
                                         <child>
                                           <object class="AdwEntryRow" id="host_entry_row">
                                             <property name="title">Server / IP Address</property>
@@ -132,8 +217,8 @@
                                         </child>
                                         <child>
                                           <object class="AdwEntryRow" id="port_entry_row">
-                                            <property name="title">Port</property>
                                             <property name="text">22</property>
+                                            <property name="title">Port</property>
                                           </object>
                                         </child>
                                         <child>
@@ -148,8 +233,8 @@
                                         </child>
                                         <child>
                                           <object class="AdwEntryRow" id="remote_path_entry_row">
-                                            <property name="title">Remote Folder Path</property>
                                             <property name="text">/home/</property>
+                                            <property name="title">Remote Folder Path</property>
                                           </object>
                                         </child>
                                         <child>
@@ -166,59 +251,56 @@
                                         </child>
                                         <child>
                                           <object class="GtkButton" id="browse_local_folder_button">
-                                            <property name="label">Select Local Folder...</property>
                                             <property name="halign">start</property>
+                                            <property name="label">Select Local Folder...</property>
                                           </object>
                                         </child>
                                       </object>
                                     </child>
-
                                     <child>
                                       <object class="AdwPreferencesGroup" id="options_group">
                                         <property name="title">SSHFS Parameters</property>
-
                                         <child>
                                           <object class="AdwSwitchRow" id="opt_reconnect_row">
+                                            <property name="subtitle">Automatically reconnect when connection is lost</property>
                                             <property name="title">reconnect</property>
-                                            <property name="subtitle">Automatically reconnect when the connection is lost</property>
                                           </object>
                                         </child>
                                         <child>
                                           <object class="AdwSwitchRow" id="opt_allow_other_row">
-                                            <property name="title">allow_other</property>
                                             <property name="subtitle">Allow access to other system users</property>
+                                            <property name="title">allow_other</property>
                                           </object>
                                         </child>
                                         <child>
                                           <object class="AdwSwitchRow" id="opt_compression_row">
-                                            <property name="title">compression (-C)</property>
                                             <property name="subtitle">Enable SSH data compression</property>
+                                            <property name="title">compression (-C)</property>
                                           </object>
                                         </child>
                                         <child>
                                           <object class="AdwSwitchRow" id="opt_readonly_row">
-                                            <property name="title">ro (read only)</property>
                                             <property name="subtitle">Mount the folder without writing permission</property>
+                                            <property name="title">ro (read only)</property>
                                           </object>
                                         </child>
                                         <child>
                                           <object class="AdwSpinRow" id="opt_serveralive_row">
-                                            <property name="title">ServerAliveInterval (sn)</property>
-                                            <property name="subtitle">0 = disabled</property>
                                             <property name="adjustment">
                                               <object class="GtkAdjustment" id="serveralive_adjustment">
                                                 <property name="lower">0</property>
+                                                <property name="page-increment">10</property>
+                                                <property name="step-increment">1</property>
                                                 <property name="upper">300</property>
                                                 <property name="value">15</property>
-                                                <property name="step-increment">1</property>
-                                                <property name="page-increment">10</property>
                                               </object>
                                             </property>
+                                            <property name="subtitle">0 = disabled</property>
+                                            <property name="title">ServerAliveInterval (sn)</property>
                                           </object>
                                         </child>
                                         <child>
                                           <object class="AdwComboRow" id="opt_cache_row">
-                                            <property name="title">cache</property>
                                             <property name="model">
                                               <object class="GtkStringList" id="cache_options">
                                                 <items>
@@ -227,15 +309,15 @@
                                                 </items>
                                               </object>
                                             </property>
+                                            <property name="title">cache</property>
                                           </object>
                                         </child>
                                       </object>
                                     </child>
-
                                     <child>
                                       <object class="GtkButton" id="connect_button">
-                                        <property name="label">Connect</property>
                                         <property name="halign">end</property>
+                                        <property name="label">Connect</property>
                                         <property name="margin-top">6</property>
                                         <style>
                                           <class name="suggested-action"/>
@@ -243,69 +325,78 @@
                                         </style>
                                       </object>
                                     </child>
-
                                   </object>
                                 </property>
+                                <property name="maximum-size">560</property>
+                                <property name="tightening-threshold">400</property>
                               </object>
                             </property>
+                            <property name="hexpand">true</property>
+                            <property name="vexpand">true</property>
                           </object>
                         </child>
-
                       </object>
                     </child>
                   </object>
                 </property>
-
-                <child type="overlay">
-                  <object class="GtkBox" id="loading_box">
-                    <property name="orientation">vertical</property>
-                    <property name="spacing">12</property>
-                    <property name="halign">center</property>
-                    <property name="valign">center</property>
-                    <property name="visible">false</property>
-                    <property name="margin-top">28</property>
-                    <property name="margin-bottom">28</property>
-                    <property name="margin-start">36</property>
-                    <property name="margin-end">36</property>
-                    <style>
-                      <class name="osd"/>
-                      <class name="card"/>
-                    </style>
-                    <child>
-                      <object class="GtkSpinner" id="loading_spinner">
-                        <property name="spinning">true</property>
-                        <property name="width-request">42</property>
-                        <property name="height-request">42</property>
-                        <property name="halign">center</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkLabel" id="loading_label">
-                        <property name="label">Scanning...</property>
-                        <style>
-                          <class name="heading"/>
-                        </style>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-
               </object>
             </property>
+            <child type="top">
+              <object class="AdwHeaderBar" id="header_bar">
+                <property name="title-widget">
+                  <object class="AdwWindowTitle" id="window_title">
+                    <property name="subtitle">Local/Remote SSH Folder Mounting Tool</property>
+                    <property name="title">SSHFS GUI</property>
+                  </object>
+                </property>
+                <child type="start">
+                  <object class="GtkButton" id="scan_button">
+                    <property name="icon-name">view-refresh-symbolic</property>
+                    <property name="tooltip-text">Scan the SSH devices on the network</property>
+                  </object>
+                </child>
+                <child type="end">
+                  <object class="GtkButton" id="disconnect_button">
+                    <property name="icon-name">media-eject-symbolic</property>
+                    <property name="sensitive">false</property>
+                    <property name="tooltip-text">Unmount</property>
+                  </object>
+                </child>
+              </object>
+            </child>
           </object>
         </property>
       </object>
     </property>
+    <property name="default-height">620</property>
+    <property name="default-width">920</property>
+    <property name="height-request">440</property>
+    <property name="title">SSHFS GUI</property>
+    <property name="width-request">640</property>
   </object>
-
   <object class="AdwActionRow" id="device_row_template">
-    <property name="title">raspberrypi.local</property>
     <property name="subtitle">192.168.1.42 · port 22</property>
+    <property name="title">raspberrypi.local</property>
     <child type="prefix">
       <object class="GtkImage" id="device_row_icon">
         <property name="icon-name">network-server-symbolic</property>
       </object>
     </child>
   </object>
-
+  <object class="AdwStatusPage" id="device_placeholder">
+    <property name="description">Press the scan button to look for SSH devices</property>
+    <property name="icon-name">network-server-symbolic</property>
+    <property name="title">No Devices</property>
+    <style>
+      <class name="compact"/>
+    </style>
+  </object>
+  <object class="AdwStatusPage" id="connected_folders_placeholder">
+    <property name="description">Mounted folders will appear here</property>
+    <property name="icon-name">folder-remote-symbolic</property>
+    <property name="title">No Connections</property>
+    <style>
+      <class name="compact"/>
+    </style>
+  </object>
 </interface>
