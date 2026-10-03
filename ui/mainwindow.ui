@@ -4,7 +4,7 @@
 <interface>
   <!-- interface-name mainwindow.ui -->
   <requires lib="gtk" version="4.0"/>
-  <requires lib="libadwaita" version="1.4"/>
+  <requires lib="libadwaita" version="1.6"/>
   <object class="AdwApplicationWindow" id="main_window">
     <property name="content">
       <object class="AdwToastOverlay" id="toast_overlay">
@@ -53,6 +53,11 @@
                                             <property name="margin-top">12</property>
                                             <property name="wrap">true</property>
                                             <property name="xalign">0</property>
+                                            <accessibility>
+                                              <property name="orientation">vertical</property>
+                                              <property name="sort">ascending</property>
+                                              <property name="value-min">0.1</property>
+                                            </accessibility>
                                             <style>
                                               <class name="heading"/>
                                             </style>
@@ -79,7 +84,7 @@
                                   </object>
                                 </child>
                                 <child>
-                                  <object class="GtkStackPage" id="sshscan_page2">
+                                  <object class="GtkStackPage" id="sshscan_progpage">
                                     <property name="child">
                                       <object class="GtkBox">
                                         <property name="halign">center</property>
@@ -96,9 +101,8 @@
                                           </object>
                                         </child>
                                         <child>
-                                          <object class="GtkLabel">
+                                          <object class="GtkLabel" id="progressmsj_label">
                                             <property name="justify">center</property>
-                                            <property name="label">Scanning SSH devices...</property>
                                             <property name="wrap">true</property>
                                             <style>
                                               <class name="dim-label"/>
@@ -107,11 +111,11 @@
                                         </child>
                                       </object>
                                     </property>
-                                    <property name="name">sshscan_page2</property>
+                                    <property name="name">sshscan_progpage</property>
                                   </object>
                                 </child>
                                 <child>
-                                  <object class="GtkStackPage" id="connected_folders">
+                                  <object class="GtkStackPage" id="connectedfolders_page">
                                     <property name="child">
                                       <object class="GtkBox">
                                         <property name="orientation">vertical</property>
@@ -131,23 +135,62 @@
                                           </object>
                                         </child>
                                         <child>
-                                          <object class="GtkScrolledWindow" id="connected_folders_scrolled">
-                                            <property name="child">
-                                              <object class="GtkListBox" id="connected_folders_listbox">
-                                                <property name="selection-mode">single</property>
-                                                <style>
-                                                  <class name="navigation-sidebar"/>
-                                                </style>
+                                          <object class="GtkStack" id="connected_folders_stack">
+                                            <child>
+                                              <object class="GtkStackPage" id="connectedfolders_list_page">
+                                                <property name="child">
+                                                  <object class="GtkScrolledWindow" id="connected_folders_scrolled">
+                                                    <property name="child">
+                                                      <object class="GtkListBox" id="connected_folders_listbox">
+                                                        <property name="selection-mode">single</property>
+                                                        <style>
+                                                          <class name="navigation-sidebar"/>
+                                                        </style>
+                                                      </object>
+                                                    </property>
+                                                    <property name="hexpand">true</property>
+                                                    <property name="hscrollbar-policy">never</property>
+                                                    <property name="vexpand">true</property>
+                                                  </object>
+                                                </property>
+                                                <property name="name">list</property>
                                               </object>
-                                            </property>
-                                            <property name="hexpand">true</property>
-                                            <property name="hscrollbar-policy">never</property>
-                                            <property name="vexpand">true</property>
+                                            </child>
+                                            <child>
+                                              <object class="GtkStackPage">
+                                                <property name="child">
+                                                  <object class="GtkLabel">
+                                                    <property name="label">Empty Page</property>
+                                                  </object>
+                                                </property>
+                                                <property name="name">empty</property>
+                                              </object>
+                                            </child>
                                           </object>
                                         </child>
                                       </object>
                                     </property>
-                                    <property name="name">connected_folders</property>
+                                    <property name="name">connectedfolders_page</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkStackPage" id="errorpage">
+                                    <property name="child">
+                                      <object class="GtkBox">
+                                        <property name="homogeneous">True</property>
+                                        <property name="orientation">vertical</property>
+                                        <child>
+                                          <object class="GtkImage">
+                                            <property name="icon-name">dialog-error</property>
+                                            <property name="pixel-size">64</property>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkLabel" id="errormsj_label"/>
+                                        </child>
+                                      </object>
+                                    </property>
+                                    <property name="name">errorpage</property>
                                   </object>
                                 </child>
                               </object>
@@ -255,6 +298,13 @@
                                             <property name="label">Select Local Folder...</property>
                                           </object>
                                         </child>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel" id="connection_failed_label">
+                                        <style>
+                                          <class name="heading"/>
+                                        </style>
                                       </object>
                                     </child>
                                     <child>
