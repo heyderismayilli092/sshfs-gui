@@ -424,29 +424,4 @@
     <property name="title">SSHFS GUI</property>
     <property name="width-request">640</property>
   </object>
-  <object class="AdwActionRow" id="device_row_template">
-    <property name="subtitle">192.168.1.42 · port 22</property>
-    <property name="title">raspberrypi.local</property>
-    <child type="prefix">
-      <object class="GtkImage" id="device_row_icon">
-        <property name="icon-name">network-server-symbolic</property>
-      </object>
-    </child>
-  </object>
-  <object class="AdwStatusPage" id="device_placeholder">
-    <property name="description">Press the scan button to look for SSH devices</property>
-    <property name="icon-name">network-server-symbolic</property>
-    <property name="title">No Devices</property>
-    <style>
-      <class name="compact"/>
-    </style>
-  </object>
-  <object class="AdwStatusPage" id="connected_folders_placeholder">
-    <property name="description">Mounted folders will appear here</property>
-    <property name="icon-name">folder-remote-symbolic</property>
-    <property name="title">No Connections</property>
-    <style>
-      <class name="compact"/>
-    </style>
-  </object>
 </interface>
