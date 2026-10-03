@@ -37,6 +37,10 @@ class MainWindow:
 
     # application gui present
     def show(self):
+        output = self.handler.iface_check()
+        if not output:
+            self.scan_button.set_sensitive(False)
+            self.connect_button.set_sensitive(False)
         self.window.present()
 
     # ssh devices scan progress
