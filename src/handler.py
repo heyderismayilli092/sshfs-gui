@@ -29,7 +29,10 @@ class Handler:
                 pass
 
         #print(devices)
-        return devices
+        if devices:
+            return devices
+        else:
+            return False
 
     # check network connection
     def iface_check(self):
@@ -45,4 +48,30 @@ class Handler:
                     return False
             except FileNotFoundError:
                 return False
+
+    # SSHF connections list
+    def list_sshfs_mounts(self):
+        sshfs_mounts = []
+        try:
+            result = subprocess.run(['mount'], capture_output=True, text=True, check=True)  # list the active mount points in the system
+            for line in result.stdout.splitlines():
+                if 'fuse.sshfs' in line or 'sshfs' in line:
+                    parts = line.split()
+                    if len(parts) >= 5 and parts[1] == 'on':
+                        remote_source = parts[0]
+                        local_target = parts[2]
+                        mount_type = parts[4]
+                        options = parts[5].strip('()') if len(parts) > 5 else ""  # if available, get the connection options from inside the parentheses
+                        sshfs_mounts.append({
+                            "remote_source": remote_source,  # host
+                            "local_mount_point": local_target, # connected path
+                            "connection_type": mount_type,     # fuse.sshfs
+                            "options": options.split(',')      # connected parameters
+                        })
+            if sshfs_mounts:
+                return sshfs_mounts
+            else:
+                return False
+        except (subprocess.SubprocessError, FileNotFoundError) as e:
+            return False
 

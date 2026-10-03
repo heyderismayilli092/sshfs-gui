@@ -20,6 +20,7 @@ class MainWindow:
         self.connect_button = builder.get_object("connect_button")
         self.disconnect_button = builder.get_object("disconnect_button")
         self.device_listbox = builder.get_object("device_listbox")
+        self.connected_folders_listbox = builder.get_object("connected_folders_listbox")
         self.host_entry = builder.get_object("host_entry_row")
         self.port_entry = builder.get_object("port_entry_row")
         self.username_entry = builder.get_object("username_entry_row")
@@ -29,10 +30,12 @@ class MainWindow:
         self.sshscan_pages = builder.get_object("sshscan_pages")
         self.sshdeviceslist_button = builder.get_object("sshdeviceslist_button")
         self.connectedfolders_button = builder.get_object("connectedfolders_button")
+        self.progressmsj_label = builder.get_object("progressmsj_label")
+        self.errormsj_label = builder.get_object("errormsj_label")
 
         self.handler = Handler(self)  # handler
         self.scan_button.connect("clicked", self.on_scan_clicked)
-        self.connectedfolders_button.connect("clicked", self.on_connectedfolder_page)
+        self.connectedfolders_button.connect("clicked", self.on_connectedfolders_page)
         self.sshdeviceslist_button.connect("clicked", self.on_sshdeviceslist_page)
 
     # application gui present
@@ -45,7 +48,8 @@ class MainWindow:
 
     # ssh devices scan progress
     def on_scan_clicked(self, button):
-        self.sshscan_pages.set_visible_child_name("sshscan_page2")
+        self.progressmsj_label.set_text("Scanning SSH devices...")
+        self.sshscan_pages.set_visible_child_name("sshscan_progpage")
         sshscan_thread = threading.Thread(target=self.scan_worker, daemon=True)
         sshscan_thread.start()
         return False
@@ -55,16 +59,38 @@ class MainWindow:
         GLib.idle_add(self.scan_finished, addresslist)
 
     def scan_finished(self, addresslist):
-        for lst in addresslist:
-            self.device_listbox.append(self.create_line_label(lst))
-        self.sshscan_pages.set_visible_child_name("sshscan_page")
+        if addresslist:
+            for lst in addresslist:
+                self.connected_folders_listbox.append(self.create_line_label(lst))
+            self.sshscan_pages.set_visible_child_name("sshscan_page")
+        else:
+            self.errormsj_label.set_text("SSH devices not found")
+            self.sshscan_pages.set_visible_child_name("errorpage")
         return False
     # ------
 
-    # Connected Folders page
-    def on_connectedfolder_page(self, button):
-        self.sshscan_pages.set_visible_child_name("connected_folders")
+    # list connected folders
+    def on_connectedfolders_page(self, button):
+        self.progressmsj_label.set_text("Listing connected folders...")
+        self.sshscan_pages.set_visible_child_name("sshscan_progpage")
+        connfolders_thread = threading.Thread(target=self.list_connected, daemon=True)
+        connfolders_thread.start()
         return False
+
+    def list_connected(self):
+        connlist = self.handler.list_sshfs_mounts()  # linked folders are being listed
+        GLib.idle_add(self.list_finished, connlist)
+
+    def list_finished(self, connlist):
+        if connlist:
+            for lst in connlist:
+                self.device_listbox.append(self.create_line_label(lst))
+            self.sshscan_pages.set_visible_child_name("connectedfolders_page")
+        else:
+            self.errormsj_label.set_text("Connected folders not found")
+            self.sshscan_pages.set_visible_child_name("errorpage")
+        return False
+    # ------
 
     # SSH devices page
     def on_sshdeviceslist_page(self, button):
