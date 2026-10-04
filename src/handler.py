@@ -2,6 +2,7 @@ import os
 import subprocess
 import socket
 import re
+import ipaddress
 
 class Handler:
     def __init__(self, window):
@@ -27,7 +28,6 @@ class Handler:
                         devices.append(ipaddress)
             except Exception:
                 pass
-
         #print(devices)
         if devices:
             return devices
@@ -36,18 +36,23 @@ class Handler:
 
     # check network connection
     def iface_check(self):
+        status = False
+        iface = None
         for ifaces in os.listdir("/sys/class/net"):
             try:
                 with open(f"/sys/class/net/{ifaces}/operstate", "r") as f:
                     stat = f.read().strip()
                 if stat in ["up", "unknown"]:
-                    return True, ifaces
-                elif stat in "down":
-                    return False
-                else:
-                    return False
+                    status = True
+                    iface = ifaces
+                    break
             except FileNotFoundError:
-                return False
+                status = False
+                iface = None
+        if status:
+            return True, iface
+        else:
+            return False
 
     # SSHF connections list
     def list_sshfs_mounts(self):
@@ -73,5 +78,14 @@ class Handler:
             else:
                 return False
         except (subprocess.SubprocessError, FileNotFoundError) as e:
+            return False
+
+    # verifies the accuracy of the entered IP address
+    def ipaddr_check(self, ipaddr):
+        try:
+            checked = ipaddress.ip_address(ipaddr.strip())
+            if checked:
+                return True
+        except ValueError:
             return False
 

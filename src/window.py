@@ -32,6 +32,8 @@ class MainWindow:
         self.connectedfolders_button = builder.get_object("connectedfolders_button")
         self.progressmsj_label = builder.get_object("progressmsj_label")
         self.errormsj_label = builder.get_object("errormsj_label")
+        self.connstatus_label = builder.get_object("connstatus_label")
+        self.browse_local_folder_button = builder.get_object("browse_local_folder_button")
 
         self.handler = Handler(self)  # handler
         self.scan_button.connect("clicked", self.on_scan_clicked)
@@ -41,6 +43,7 @@ class MainWindow:
     # application gui present
     def show(self):
         output = self.handler.iface_check()
+        print("iface: ", output)
         if not output:
             self.scan_button.set_sensitive(False)
             self.connect_button.set_sensitive(False)
@@ -48,8 +51,11 @@ class MainWindow:
 
     # ssh devices scan progress
     def on_scan_clicked(self, button):
+        print("Scanning SSH devices...")
         self.progressmsj_label.set_text("Scanning SSH devices...")
         self.sshscan_pages.set_visible_child_name("sshscan_progpage")
+        self.sshdeviceslist_button.set_sensitive(False)
+        self.scan_button.set_sensitive(False)
         sshscan_thread = threading.Thread(target=self.scan_worker, daemon=True)
         sshscan_thread.start()
         return False
@@ -59,9 +65,12 @@ class MainWindow:
         GLib.idle_add(self.scan_finished, addresslist)
 
     def scan_finished(self, addresslist):
+        self.sshdeviceslist_button.set_sensitive(True)
+        self.scan_button.set_sensitive(True)
+        print("Devices: ", addresslist)
         if addresslist:
             for lst in addresslist:
-                self.connected_folders_listbox.append(self.create_line_label(lst))
+                self.device_listbox.append(self.create_line_label(lst))
             self.sshscan_pages.set_visible_child_name("sshscan_page")
         else:
             self.errormsj_label.set_text("SSH devices not found")
@@ -71,6 +80,7 @@ class MainWindow:
 
     # list connected folders
     def on_connectedfolders_page(self, button):
+        print("Listing connected folders...")
         self.progressmsj_label.set_text("Listing connected folders...")
         self.sshscan_pages.set_visible_child_name("sshscan_progpage")
         connfolders_thread = threading.Thread(target=self.list_connected, daemon=True)
@@ -84,7 +94,7 @@ class MainWindow:
     def list_finished(self, connlist):
         if connlist:
             for lst in connlist:
-                self.device_listbox.append(self.create_line_label(lst))
+                self.connected_folders_listbox.append(self.create_line_label(lst))
             self.sshscan_pages.set_visible_child_name("connectedfolders_page")
         else:
             self.errormsj_label.set_text("Connected folders not found")
