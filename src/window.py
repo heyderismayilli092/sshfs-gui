@@ -39,6 +39,10 @@ class MainWindow:
         self.scan_button.connect("clicked", self.on_scan_clicked)
         self.connectedfolders_button.connect("clicked", self.on_connectedfolders_page)
         self.sshdeviceslist_button.connect("clicked", self.on_sshdeviceslist_page)
+        self.browse_local_folder_button.connect("clicked", self.on_select_directory)
+
+        # variables
+        self.bind_folder = None
 
     # application gui present
     def show(self):
@@ -56,6 +60,7 @@ class MainWindow:
         self.sshscan_pages.set_visible_child_name("sshscan_progpage")
         self.sshdeviceslist_button.set_sensitive(False)
         self.scan_button.set_sensitive(False)
+        self.connectedfolders_button.set_sensitive(False)
         sshscan_thread = threading.Thread(target=self.scan_worker, daemon=True)
         sshscan_thread.start()
         return False
@@ -67,6 +72,7 @@ class MainWindow:
     def scan_finished(self, addresslist):
         self.sshdeviceslist_button.set_sensitive(True)
         self.scan_button.set_sensitive(True)
+        self.connectedfolders_button.set_sensitive(True)
         print("Devices: ", addresslist)
         if addresslist:
             for lst in addresslist:
@@ -93,8 +99,13 @@ class MainWindow:
 
     def list_finished(self, connlist):
         if connlist:
+            print(connlist)
+            # check list
+            if self.connected_folders_listbox:
+                while child := self.connected_folders_listbox.get_first_child():
+                    self.connected_folders_listbox.remove(child)
             for lst in connlist:
-                self.connected_folders_listbox.append(self.create_line_label(lst))
+                self.connected_folders_listbox.append(self.create_connfolders_list(lst["local_mount_point"].split("/")[-1]))
             self.sshscan_pages.set_visible_child_name("connectedfolders_page")
         else:
             self.errormsj_label.set_text("Connected folders not found")
@@ -107,8 +118,34 @@ class MainWindow:
         self.sshscan_pages.set_visible_child_name("sshscan_page")
         return False
 
+    # select bind folder
+    def on_select_directory(self, button):
+        # we keep the dialog within `self` to prevent early garbage collection
+        self._req_dialog = Gtk.FileChooserNative(
+            title="Choose connection folder",
+            transient_for=self.window,
+            action=Gtk.FileChooserAction.SELECT_FOLDER,
+            accept_label="Select",
+            cancel_label="Cancel"
+        )
+        # response handler
+        self._req_dialog.connect("response", self.on_dir_response)
+        self._req_dialog.show()
+
+    def on_dir_response(self, dialog, response):
+        if response == Gtk.ResponseType.ACCEPT:
+            folder = dialog.get_file()
+            if folder is not None:
+                path = folder.get_path()
+                if path:
+                    self.bind_folder = path
+                    print("Selected bind folder:", self.bind_folder)
+        # close the dialog via the main loop
+        GLib.idle_add(lambda: (dialog.destroy(), setattr(self, "_req_dialog", None))[0])
+
 
     # function(s) that create objects for GtkListBox rows
+    # enables the listing of discovered SSH devices
     def create_line_label(self, text):
         hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
         # label
@@ -116,10 +153,35 @@ class MainWindow:
         label.set_label(text)
         label.set_hexpand(True)
         label.set_halign(Gtk.Align.START)
+        # append in box
         hbox.append(label)
         hbox.set_margin_top(6)
         hbox.set_margin_bottom(6)
         hbox.set_margin_start(6)
         hbox.set_margin_end(6)
         return hbox
+
+    # enables listing of linked folders
+    def create_connfolders_list(self, text):
+        row_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        row_box.set_hexpand(True)
+        row_box.set_halign(Gtk.Align.FILL)
+        # mount folder title
+        label = Gtk.Label(label=text)
+        label.set_hexpand(True)
+        label.set_halign(Gtk.Align.START)
+        # about button
+        about_button = Gtk.Button()
+        about_button.set_icon_name("help-about-symbolic")
+        about_button.set_tooltip_text("About")
+        # unmount button
+        umount_button = Gtk.Button()
+        umount_button.set_icon_name("media-eject-symbolic")
+        umount_button.set_tooltip_text("Unmount")
+        # append in box
+        row_box.append(label)
+        row_box.append(about_button)
+        row_box.append(umount_button)
+        return row_box
+
 

@@ -75,6 +75,8 @@
                                             </property>
                                             <property name="hexpand">true</property>
                                             <property name="hscrollbar-policy">never</property>
+                                            <property name="propagate-natural-height">True</property>
+                                            <property name="propagate-natural-width">True</property>
                                             <property name="vexpand">true</property>
                                           </object>
                                         </child>
@@ -301,7 +303,7 @@
                                       </object>
                                     </child>
                                     <child>
-                                      <object class="GtkLabel" id="connection_failed_label">
+                                      <object class="GtkLabel" id="connstatus_label">
                                         <style>
                                           <class name="heading"/>
                                         </style>
