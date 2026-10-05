@@ -283,21 +283,10 @@
                                           </object>
                                         </child>
                                         <child>
-                                          <object class="GtkBox" id="local_mount_row_box">
-                                            <property name="orientation">horizontal</property>
-                                            <property name="spacing">6</property>
-                                            <child>
-                                              <object class="AdwEntryRow" id="local_mount_entry_row">
-                                                <property name="hexpand">true</property>
-                                                <property name="title">Local Bind Point</property>
-                                              </object>
-                                            </child>
-                                          </object>
-                                        </child>
-                                        <child>
                                           <object class="GtkButton" id="browse_local_folder_button">
                                             <property name="halign">start</property>
                                             <property name="label">Select Local Folder...</property>
+                                            <property name="margin-top">5</property>
                                           </object>
                                         </child>
                                       </object>
@@ -328,6 +317,12 @@
                                           <object class="AdwSwitchRow" id="opt_compression_row">
                                             <property name="subtitle">Enable SSH data compression</property>
                                             <property name="title">compression (-C)</property>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="AdwSwitchRow" id="opt_follow_symlinks_row">
+                                            <property name="subtitle">Follow symbolic links on the remote server</property>
+                                            <property name="title">follow_symlinks</property>
                                           </object>
                                         </child>
                                         <child>
