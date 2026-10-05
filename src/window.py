@@ -26,7 +26,6 @@ class MainWindow:
         self.username_entry = builder.get_object("username_entry_row")
         self.password_entry = builder.get_object("password_entry_row")
         self.remote_path_entry = builder.get_object("remote_path_entry_row")
-        self.local_mount_entry = builder.get_object("local_mount_entry_row")
         self.sshscan_pages = builder.get_object("sshscan_pages")
         self.sshdeviceslist_button = builder.get_object("sshdeviceslist_button")
         self.connectedfolders_button = builder.get_object("connectedfolders_button")
@@ -34,12 +33,20 @@ class MainWindow:
         self.errormsj_label = builder.get_object("errormsj_label")
         self.connstatus_label = builder.get_object("connstatus_label")
         self.browse_local_folder_button = builder.get_object("browse_local_folder_button")
+        self.opt_reconnect_row = builder.get_object("opt_reconnect_row")
+        self.opt_allow_other_row = builder.get_object("opt_allow_other_row")
+        self.opt_compression_row = builder.get_object("opt_compression_row")
+        self.opt_readonly_row = builder.get_object("opt_readonly_row")
+        self.opt_serveralive_row = builder.get_object("opt_serveralive_row")
+        self.opt_cache_row = builder.get_object("opt_cache_row")
 
         self.handler = Handler(self)  # handler
+        # signals
         self.scan_button.connect("clicked", self.on_scan_clicked)
         self.connectedfolders_button.connect("clicked", self.on_connectedfolders_page)
         self.sshdeviceslist_button.connect("clicked", self.on_sshdeviceslist_page)
         self.browse_local_folder_button.connect("clicked", self.on_select_directory)
+        self.connect_button.connect("clicked", self.on_connect)
 
         # variables
         self.bind_folder = None
@@ -52,6 +59,7 @@ class MainWindow:
             self.scan_button.set_sensitive(False)
             self.connect_button.set_sensitive(False)
         self.window.present()
+
 
     # ssh devices scan progress
     def on_scan_clicked(self, button):
@@ -84,6 +92,7 @@ class MainWindow:
         return False
     # ------
 
+
     # list connected folders
     def on_connectedfolders_page(self, button):
         print("Listing connected folders...")
@@ -113,10 +122,12 @@ class MainWindow:
         return False
     # ------
 
+
     # SSH devices page
     def on_sshdeviceslist_page(self, button):
         self.sshscan_pages.set_visible_child_name("sshscan_page")
         return False
+
 
     # select bind folder
     def on_select_directory(self, button):
@@ -140,8 +151,96 @@ class MainWindow:
                 if path:
                     self.bind_folder = path
                     print("Selected bind folder:", self.bind_folder)
+                    self.connstatus_label.set_text("Selected bind folder: '"+self.bind_folder+"'")
         # close the dialog via the main loop
         GLib.idle_add(lambda: (dialog.destroy(), setattr(self, "_req_dialog", None))[0])
+
+
+    # connect progress
+    def on_connect(self, button):
+        hostipaddr = self.host_entry.get_text()
+        portnumber = self.port_entry.get_text()
+        username = self.username_entry.get_text()
+        password = self.password_entry.get_text()
+        remotepath = self.remote_path_entry.get_text()
+        # ip address check
+        if not hostipaddr:
+            print("Enter a host ip address !")
+            self.connstatus_label.set_text("Enter a host ip address !")
+            return False
+        else:
+            checkip = self.handler.ipaddr_check(hostipaddr)
+            if not checkip:
+                print("Enter a valid IP address!")
+                self.connstatus_label.set_text("Enter a valid IP address!")
+                return False
+        # port number check
+        if not portnumber:
+            print("Enter a port number !")
+            self.connstatus_label.set_text("Enter a port number !")
+            return False
+        else:
+            if int(portnumber) > 65535:
+                print("Enter the correct port number !")
+                self.connstatus_label.set_text("Enter the correct port number !")
+                return False
+        # username check
+        if not username:
+            print("Enter a username !")
+            self.connstatus_label.set_text("Enter a username !")
+            return False
+        # password check
+        if not username:
+            print("Enter a password !")
+            self.connstatus_label.set_text("Enter a password !")
+            return False
+        # check bind folder select
+        if not self.bind_folder:
+            print("Select the folder to be linked from the computer !")
+            self.connstatus_label.set_text("Select the folder to be linked from the computer !")
+            return False
+        else:
+            checkfolder = self.handler.bindfolder_check(self.bind_folder)
+            if not checkfolder:
+                print(checkfolder[1])
+                self.connstatus_label.set_text(checkfolder[1])
+                return False
+        # remote path check
+        if not remotepath:
+            print("Enter the folder path on the remote side !")
+            self.connstatus_label.set_text("Enter the folder path on the remote side !")
+            return False
+
+        # sshf parameters
+        sshfs_parameters = ""  # parameters list
+        if self.opt_allow_other_row.get_active():
+            sshfs_parameters += "reconnect,"
+        if self.opt_allow_other_row.get_active():
+            sshfs_parameters += "allow_other,"
+        if self.opt_compression_row.get_active():
+            sshfs_parameters += "compression=yes,"
+        if self.opt_readonly_row.get_active():
+            sshfs_parameters += "ro,"
+        serveralive_num = self.opt_serveralive_row.get_value()
+        if int(serveralive_num) != 0:
+            sshfs_parameters += f"ServerAliveInterval={int(serveralive_num)},"
+        print("sshfs parameters: ", sshfs_parameters)
+        conn_thread = threading.Thread(target=self.connect_progress, daemon=True, args=(username, hostipaddr, remotepath, self.bind_folder, password, sshfs_parameters))
+        conn_thread.start()
+        return False
+
+    def connect_progress(self, username, host, remote_path, local_path, password, parameters):
+        output = self.handler.connect_sshfs(username, host, remote_path, local_path, password, parameters)  # linked folders are being listed
+        GLib.idle_add(self.connected_finished, output)
+
+    def connected_finished(self, output):
+        if output == True:
+            self.connstatus_label.set_text("Connected successfully !")
+            return False
+        else:
+            errormsj = output[1]
+            self.connstatus_label.set_text(errormsj)
+            return False
 
 
     # function(s) that create objects for GtkListBox rows
@@ -183,5 +282,4 @@ class MainWindow:
         row_box.append(about_button)
         row_box.append(umount_button)
         return row_box
-
 

@@ -3,15 +3,18 @@ import subprocess
 import socket
 import re
 import ipaddress
+import time
 
 class Handler:
     def __init__(self, window):
         self.window = window
+        self.process = None
 
     # network ID ip address
     def network_id(self):
         ip = subprocess.check_output(["hostname", "-I"], text=True).split()[0]
         return ip.rsplit(".", 1)[0]
+
 
     # scan ssh devices on local network
     def scan_ssh(self):
@@ -34,6 +37,7 @@ class Handler:
         else:
             return False
 
+
     # check network connection
     def iface_check(self):
         status = False
@@ -53,6 +57,7 @@ class Handler:
             return True, iface
         else:
             return False
+
 
     # SSHF connections list
     def list_sshfs_mounts(self):
@@ -80,6 +85,7 @@ class Handler:
         except (subprocess.SubprocessError, FileNotFoundError) as e:
             return False
 
+
     # verifies the accuracy of the entered IP address
     def ipaddr_check(self, ipaddr):
         try:
@@ -88,4 +94,31 @@ class Handler:
                 return True
         except ValueError:
             return False
+
+
+    # linked folder check
+    def bindfolder_check(self, folder):
+        if not os.path.exists(folder):
+            return False, "Bind folder not avaliabe !"
+        if len(os.listdir(folder)) != 0:
+            return False, "Select an empty folder !"
+        return True
+
+
+    # sshfs connect
+    def connect_sshfs(self, username, host, remote_path, local_path, password, parameters):
+        command = [
+            "sshfs",
+            "-o",
+            f"password_stdin,{parameters.strip(',')}",
+            f"{username}@{host}:{remote_path}",
+            local_path
+        ]
+        print("connect command: ", command)
+        process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        stdout, stderr = process.communicate(input=password+"\n")
+        if process.returncode == 0:
+            return True
+        else:
+            return False, stderr
 
