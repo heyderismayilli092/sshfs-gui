@@ -39,6 +39,7 @@ class MainWindow:
         self.opt_readonly_row = builder.get_object("opt_readonly_row")
         self.opt_serveralive_row = builder.get_object("opt_serveralive_row")
         self.opt_cache_row = builder.get_object("opt_cache_row")
+        self.opt_follow_symlinks_row = builder.get_object("opt_follow_symlinks_row")
 
         self.handler = Handler(self)  # handler
         # signals
@@ -47,9 +48,16 @@ class MainWindow:
         self.sshdeviceslist_button.connect("clicked", self.on_sshdeviceslist_page)
         self.browse_local_folder_button.connect("clicked", self.on_select_directory)
         self.connect_button.connect("clicked", self.on_connect)
+        self.opt_reconnect_row.connect("notify::active", self.on_opt_reconnect_row)
+        self.opt_allow_other_row.connect("notify::active", self.on_opt_allow_other_row)
+        self.opt_compression_row.connect("notify::active", self.on_opt_compression_row)
+        self.opt_readonly_row.connect("notify::active", self.on_opt_readonly_row)
+        self.opt_follow_symlinks_row.connect("notify::active", self.on_opt_follow_symlinks_row)
+
 
         # variables
-        self.bind_folder = None
+        self.bind_folder = None  # bind folder
+        self.sshfs_parameters = []  # sshfs connect parameters
 
     # application gui present
     def show(self):
@@ -211,19 +219,12 @@ class MainWindow:
             self.connstatus_label.set_text("Enter the folder path on the remote side !")
             return False
 
-        # sshf parameters
-        sshfs_parameters = ""  # parameters list
-        if self.opt_allow_other_row.get_active():
-            sshfs_parameters += "reconnect,"
-        if self.opt_allow_other_row.get_active():
-            sshfs_parameters += "allow_other,"
-        if self.opt_compression_row.get_active():
-            sshfs_parameters += "compression=yes,"
-        if self.opt_readonly_row.get_active():
-            sshfs_parameters += "ro,"
+        print("Connecting...")
+        self.connstatus_label.set_text("Connecting...")
         serveralive_num = self.opt_serveralive_row.get_value()
         if int(serveralive_num) != 0:
-            sshfs_parameters += f"ServerAliveInterval={int(serveralive_num)},"
+            self.sshfs_parameters.append(f"ServerAliveInterval={int(serveralive_num)},")
+        sshfs_parameters = "".join(self.sshfs_parameters)
         print("sshfs parameters: ", sshfs_parameters)
         conn_thread = threading.Thread(target=self.connect_progress, daemon=True, args=(username, hostipaddr, remotepath, self.bind_folder, password, sshfs_parameters))
         conn_thread.start()
@@ -235,11 +236,13 @@ class MainWindow:
 
     def connected_finished(self, output):
         if output == True:
+            print("Connected successfully !")
             self.connstatus_label.set_text("Connected successfully !")
             return False
         else:
             errormsj = output[1]
-            self.connstatus_label.set_text(errormsj)
+            print("Error: "+errormsj)
+            self.connstatus_label.set_text("Error: "+errormsj)
             return False
 
 
@@ -282,4 +285,54 @@ class MainWindow:
         row_box.append(about_button)
         row_box.append(umount_button)
         return row_box
+
+    # 'reconnect' parameter
+    def on_opt_reconnect_row(self, widget, pspec):
+        if widget.get_active():
+            print("added new parameter: reconnect")
+            self.sshfs_parameters.append("reconnect,")
+        else:
+            if "reconnect," in self.sshfs_parameters:
+                print("removed parameter: reconnect")
+                self.sshfs_parameters.remove("reconnect,")
+
+    # 'allow_other' parameter
+    def on_opt_allow_other_row(self, widget, pspec):
+        if widget.get_active():
+            print("added new parameter: allow_other")
+            self.sshfs_parameters.append("allow_other,")
+        else:
+            if "allow_other," in self.sshfs_parameters:
+                print("removed parameter: allow_other")
+                self.sshfs_parameters.remove("allow_other,")
+
+    # 'compression=yes' parameter
+    def on_opt_compression_row(self, widget, pspec):
+        if widget.get_active():
+            print("added new parameter: compression=yes")
+            self.sshfs_parameters.append("compression=yes,")
+        else:
+            if "compression=yes," in self.sshfs_parameters:
+                print("removed parameter: compression=yes")
+                self.sshfs_parameters.remove("compression=yes,")
+
+    # 'ro' parameter
+    def on_opt_readonly_row(self, widget, pspec):
+        if widget.get_active():
+            print("added new parameter: ro")
+            self.sshfs_parameters.append("ro,")
+        else:
+            if "ro," in self.sshfs_parameters:
+                print("removed parameter: ro")
+                self.sshfs_parameters.remove("ro,")
+
+    # 'follow_symlinks' parameter
+    def on_opt_follow_symlinks_row(self, widget, pspec):
+        if widget.get_active():
+            print("added new parameter: follow_symlinks")
+            self.sshfs_parameters.append("follow_symlinks,")
+        else:
+            if "follow_symlinks," in self.sshfs_parameters:
+                print("removed parameter: follow_symlinks")
+                self.sshfs_parameters.remove("follow_symlinks,")
 
