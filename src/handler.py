@@ -10,6 +10,15 @@ class Handler:
         self.window = window
         self.process = None
 
+
+    # converts byte values ​​into a human-readable format
+    def byteformat_size(self, n):
+        for unit in ("B", "KB", "MB", "GB", "TB"):
+            if n < 1024 or unit == "TB":
+                return f"{n:.1f} {unit}"
+            n /= 1024
+
+
     # network ID ip address
     def network_id(self):
         ip = subprocess.check_output(["hostname", "-I"], text=True).split()[0]
@@ -121,4 +130,26 @@ class Handler:
             return True
         else:
             return False, stderr
+
+
+    # unmount connected path
+    def unmount_path(self, path):
+        command = ["umount", path]
+        process = subprocess.run(command, capture_output=True, text=True)
+        if process.returncode == 0:
+            return True
+        else:
+            return False
+
+
+    # displays the size information of a folder
+    def pathsizeinfo(self, path):
+        try:
+            st = os.statvfs(path)
+            total = st.f_blocks * st.f_frsize  # retrieve total size
+            free = st.f_bavail * st.f_frsize  # retrieve free size
+            used = total - free  # retrieve used size
+            return { "total": total, "free": free, "used": used }
+        except:
+            return False
 

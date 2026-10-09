@@ -27,6 +27,7 @@ class MainWindow:
         self.password_entry = builder.get_object("password_entry_row")
         self.remote_path_entry = builder.get_object("remote_path_entry_row")
         self.sshscan_pages = builder.get_object("sshscan_pages")
+        self.connection_stack = builder.get_object("connection_stack")
         self.sshdeviceslist_button = builder.get_object("sshdeviceslist_button")
         self.connectedfolders_button = builder.get_object("connectedfolders_button")
         self.progressmsj_label = builder.get_object("progressmsj_label")
@@ -40,6 +41,14 @@ class MainWindow:
         self.opt_serveralive_row = builder.get_object("opt_serveralive_row")
         self.opt_cache_row = builder.get_object("opt_cache_row")
         self.opt_follow_symlinks_row = builder.get_object("opt_follow_symlinks_row")
+        self.connection_type_row = builder.get_object("connection_type_row")
+        self.remote_source_row = builder.get_object("remote_source_row")
+        self.local_mount_point_row = builder.get_object("local_mount_point_row")
+        self.options_row = builder.get_object("options_row")
+        self.total_size_row = builder.get_object("total_size_row")
+        self.used_size_row = builder.get_object("used_size_row")
+        self.free_space_row = builder.get_object("free_space_row")
+        self.disk_usage_levelbar = builder.get_object("disk_usage_levelbar")
 
         self.handler = Handler(self)  # handler
         # signals
@@ -58,6 +67,7 @@ class MainWindow:
         # variables
         self.bind_folder = None  # bind folder
         self.sshfs_parameters = []  # sshfs connect parameters
+        self.disconnect_button_handlerid = None
 
     # application gui present
     def show(self):
@@ -122,7 +132,7 @@ class MainWindow:
                 while child := self.connected_folders_listbox.get_first_child():
                     self.connected_folders_listbox.remove(child)
             for lst in connlist:
-                self.connected_folders_listbox.append(self.create_connfolders_list(lst["local_mount_point"].split("/")[-1]))
+                self.connected_folders_listbox.append(self.create_connfolders_list(lst))
             self.sshscan_pages.set_visible_child_name("connectedfolders_page")
         else:
             self.errormsj_label.set_text("Connected folders not found")
@@ -244,6 +254,83 @@ class MainWindow:
             print("Error: "+errormsj)
             self.connstatus_label.set_text("Error: "+errormsj)
             return False
+    # ------
+
+
+    # displays information about the mounted folder
+    def on_mountpathinfo(self, button, conninfo):
+        self.disconnect_button.set_sensitive(True)  # unmount button enable
+        # old signal on the unmount button is removed and a new one is written
+        if hasattr(self, "disconnect_button_handlerid") and self.disconnect_button_handlerid:
+            self.disconnect_button.disconnect(self.disconnect_button_handlerid)
+        self.disconnect_button_handlerid = self.disconnect_button.connect("clicked", self.on_unmountpath, conninfo["local_mount_point"])  # unmount button signal
+        pathinfo_thread = threading.Thread(target=self.pathinfo_progress, daemon=True, args=(conninfo,))
+        pathinfo_thread.start()
+        return False
+
+    def pathinfo_progress(self, conninfo):
+        local_mountpoint = conninfo["local_mount_point"]
+        output_sizeinfo = self.handler.pathsizeinfo(local_mountpoint)
+        GLib.idle_add(self.pathinfo_finished, output_sizeinfo, conninfo)
+
+    def pathinfo_finished(self, output_sizeinfo, conninfo):
+        if conninfo:
+            # printing mounted folder information
+            print("Printing folder information...")
+            print("source: ", conninfo["remote_source"])
+            self.connection_type_row.set_subtitle(conninfo["connection_type"])
+            self.remote_source_row.set_subtitle(conninfo["remote_source"])
+            self.local_mount_point_row.set_subtitle(conninfo["local_mount_point"])
+            self.options_row.set_subtitle(str(conninfo["options"]))
+            if output_sizeinfo:
+                # path dimension details are being printed
+                total_size = str(self.handler.byteformat_size(output_sizeinfo["total"]))
+                print("total size: ", total_size)
+                used_size = str(self.handler.byteformat_size(output_sizeinfo["used"]))
+                print("used size: ", used_size)
+                free_space = str(self.handler.byteformat_size(output_sizeinfo["free"]))
+                print("free space: ", free_space)
+                self.total_size_row.set_subtitle(total_size)
+                self.used_size_row.set_subtitle(used_size)
+                self.free_space_row.set_subtitle(free_space)
+                # it is displayed within the GtkLevelBar
+                self.disk_usage_levelbar.set_max_value(output_sizeinfo["total"])
+                self.disk_usage_levelbar.set_value(output_sizeinfo["used"])
+            else:
+                self.total_size_row.set_subtitle("unknown")
+                self.used_size_row.set_subtitle("unknown")
+                self.free_space_row.set_subtitle("unknown")
+            self.connection_stack.set_visible_child_name("info_page")
+            print("-"*20)
+        else:
+            self.connection_stack.set_visible_child_name("conn_page")
+            print("The information for the mounted folder could not be displayed !")
+            self.connstatus_label.set_text("The information for the mounted folder could not be displayed !")
+        return False
+    # ------
+
+
+    # connected path unmount
+    def on_unmountpath(self, button, mountpath):
+        unmount_thread = threading.Thread(target=self.unmount_progress, daemon=True, args=(mountpath,))
+        unmount_thread.start()
+        return False
+
+    def unmount_progress(self, mountpath):
+        output = self.handler.unmount_path(mountpath)
+        GLib.idle_add(self.unmount_finished, output, mountpath)
+
+    def unmount_finished(self, output, mountpath):
+        if output:
+            print(f"'{mountpath}' unmount successfully")
+            self.connstatus_label.set_text(f"'{mountpath}' unmount successfully")
+        else:
+            print(f"'{mountpath}' unmount progress failed !")
+            self.connstatus_label.set_text(f"'{mountpath}' unmount progress failed !")
+        self.connection_stack.set_visible_child_name("conn_page")
+        self.disconnect_button.set_sensitive(False)
+        return False
+    # ------
 
 
     # function(s) that create objects for GtkListBox rows
@@ -264,26 +351,22 @@ class MainWindow:
         return hbox
 
     # enables listing of linked folders
-    def create_connfolders_list(self, text):
+    def create_connfolders_list(self, conninfolist):
         row_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         row_box.set_hexpand(True)
         row_box.set_halign(Gtk.Align.FILL)
         # mount folder title
-        label = Gtk.Label(label=text)
+        label = Gtk.Label(label=conninfolist["local_mount_point"].split("/")[-1])
         label.set_hexpand(True)
         label.set_halign(Gtk.Align.START)
         # about button
         about_button = Gtk.Button()
         about_button.set_icon_name("help-about-symbolic")
         about_button.set_tooltip_text("About")
-        # unmount button
-        umount_button = Gtk.Button()
-        umount_button.set_icon_name("media-eject-symbolic")
-        umount_button.set_tooltip_text("Unmount")
+        about_button.connect("clicked", self.on_mountpathinfo, conninfolist)
         # append in box
         row_box.append(label)
         row_box.append(about_button)
-        row_box.append(umount_button)
         return row_box
 
     # 'reconnect' parameter
