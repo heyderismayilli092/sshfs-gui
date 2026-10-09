@@ -244,132 +244,250 @@
                             <property name="child">
                               <object class="AdwClamp" id="form_clamp">
                                 <property name="child">
-                                  <object class="GtkBox" id="form_box">
-                                    <property name="margin-bottom">24</property>
-                                    <property name="margin-end">12</property>
-                                    <property name="margin-start">12</property>
-                                    <property name="margin-top">24</property>
-                                    <property name="orientation">vertical</property>
-                                    <property name="spacing">18</property>
+                                  <object class="GtkStack" id="connection_stack">
+                                    <property name="transition-type">crossfade</property>
+                                    <property name="visible-child-name">form_page</property>
                                     <child>
-                                      <object class="AdwPreferencesGroup" id="connection_group">
-                                        <property name="description">The selected device is filled in automatically; edit if necessary</property>
-                                        <property name="title">Connection Information</property>
-                                        <child>
-                                          <object class="AdwEntryRow" id="host_entry_row">
-                                            <property name="title">Server / IP Address</property>
-                                          </object>
-                                        </child>
-                                        <child>
-                                          <object class="AdwEntryRow" id="port_entry_row">
-                                            <property name="text">22</property>
-                                            <property name="title">Port</property>
-                                          </object>
-                                        </child>
-                                        <child>
-                                          <object class="AdwEntryRow" id="username_entry_row">
-                                            <property name="title">Username</property>
-                                          </object>
-                                        </child>
-                                        <child>
-                                          <object class="AdwPasswordEntryRow" id="password_entry_row">
-                                            <property name="title">Password (SSH key is used if left blank)</property>
-                                          </object>
-                                        </child>
-                                        <child>
-                                          <object class="AdwEntryRow" id="remote_path_entry_row">
-                                            <property name="text">/home/</property>
-                                            <property name="title">Remote Folder Path</property>
-                                          </object>
-                                        </child>
-                                        <child>
-                                          <object class="GtkButton" id="browse_local_folder_button">
-                                            <property name="halign">start</property>
-                                            <property name="label">Select Local Folder...</property>
-                                            <property name="margin-top">5</property>
-                                          </object>
-                                        </child>
-                                      </object>
-                                    </child>
-                                    <child>
-                                      <object class="GtkLabel" id="connstatus_label">
-                                        <style>
-                                          <class name="heading"/>
-                                        </style>
-                                      </object>
-                                    </child>
-                                    <child>
-                                      <object class="AdwPreferencesGroup" id="options_group">
-                                        <property name="title">SSHFS Parameters</property>
-                                        <child>
-                                          <object class="AdwSwitchRow" id="opt_reconnect_row">
-                                            <property name="subtitle">Automatically reconnect when connection is lost</property>
-                                            <property name="title">reconnect</property>
-                                          </object>
-                                        </child>
-                                        <child>
-                                          <object class="AdwSwitchRow" id="opt_allow_other_row">
-                                            <property name="subtitle">Allow access to other system users</property>
-                                            <property name="title">allow_other</property>
-                                          </object>
-                                        </child>
-                                        <child>
-                                          <object class="AdwSwitchRow" id="opt_compression_row">
-                                            <property name="subtitle">Enable SSH data compression</property>
-                                            <property name="title">compression (-C)</property>
-                                          </object>
-                                        </child>
-                                        <child>
-                                          <object class="AdwSwitchRow" id="opt_follow_symlinks_row">
-                                            <property name="subtitle">Follow symbolic links on the remote server</property>
-                                            <property name="title">follow_symlinks</property>
-                                          </object>
-                                        </child>
-                                        <child>
-                                          <object class="AdwSwitchRow" id="opt_readonly_row">
-                                            <property name="subtitle">Mount the folder without writing permission</property>
-                                            <property name="title">ro (read only)</property>
-                                          </object>
-                                        </child>
-                                        <child>
-                                          <object class="AdwSpinRow" id="opt_serveralive_row">
-                                            <property name="adjustment">
-                                              <object class="GtkAdjustment" id="serveralive_adjustment">
-                                                <property name="lower">0</property>
-                                                <property name="page-increment">10</property>
-                                                <property name="step-increment">1</property>
-                                                <property name="upper">300</property>
-                                                <property name="value">15</property>
+                                      <object class="GtkStackPage" id="form_page">
+                                        <property name="child">
+                                          <object class="GtkBox" id="form_box">
+                                            <property name="margin-bottom">24</property>
+                                            <property name="margin-end">12</property>
+                                            <property name="margin-start">12</property>
+                                            <property name="margin-top">24</property>
+                                            <property name="orientation">vertical</property>
+                                            <property name="spacing">18</property>
+                                            <child>
+                                              <object class="AdwPreferencesGroup" id="connection_group">
+                                                <property name="description">The selected device is filled in automatically; edit if necessary</property>
+                                                <property name="title">Connection Information</property>
+                                                <child>
+                                                  <object class="AdwEntryRow" id="host_entry_row">
+                                                    <property name="title">Server / IP Address</property>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="AdwEntryRow" id="port_entry_row">
+                                                    <property name="text">22</property>
+                                                    <property name="title">Port</property>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="AdwEntryRow" id="username_entry_row">
+                                                    <property name="title">Username</property>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="AdwPasswordEntryRow" id="password_entry_row">
+                                                    <property name="title">Password (SSH key is used if left blank)</property>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="AdwEntryRow" id="remote_path_entry_row">
+                                                    <property name="text">/home/</property>
+                                                    <property name="title">Remote Folder Path</property>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="GtkButton" id="browse_local_folder_button">
+                                                    <property name="halign">start</property>
+                                                    <property name="label">Select Local Folder...</property>
+                                                    <property name="margin-top">5</property>
+                                                  </object>
+                                                </child>
                                               </object>
-                                            </property>
-                                            <property name="subtitle">0 = disabled</property>
-                                            <property name="title">ServerAliveInterval (sn)</property>
-                                          </object>
-                                        </child>
-                                        <child>
-                                          <object class="AdwComboRow" id="opt_cache_row">
-                                            <property name="model">
-                                              <object class="GtkStringList" id="cache_options">
-                                                <items>
-                                                  <item>yes</item>
-                                                  <item>no</item>
-                                                </items>
+                                            </child>
+                                            <child>
+                                              <object class="GtkLabel" id="connstatus_label">
+                                                <style>
+                                                  <class name="heading"/>
+                                                </style>
                                               </object>
-                                            </property>
-                                            <property name="title">cache</property>
+                                            </child>
+                                            <child>
+                                              <object class="AdwPreferencesGroup" id="options_group">
+                                                <property name="title">SSHFS Parameters</property>
+                                                <child>
+                                                  <object class="AdwSwitchRow" id="opt_reconnect_row">
+                                                    <property name="subtitle">Automatically reconnect when connection is lost</property>
+                                                    <property name="title">reconnect</property>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="AdwSwitchRow" id="opt_allow_other_row">
+                                                    <property name="subtitle">Allow access to other system users</property>
+                                                    <property name="title">allow_other</property>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="AdwSwitchRow" id="opt_compression_row">
+                                                    <property name="subtitle">Enable SSH data compression</property>
+                                                    <property name="title">compression (-C)</property>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="AdwSwitchRow" id="opt_follow_symlinks_row">
+                                                    <property name="subtitle">Follow symbolic links on the remote server</property>
+                                                    <property name="title">follow_symlinks</property>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="AdwSwitchRow" id="opt_readonly_row">
+                                                    <property name="subtitle">Mount the folder without writing permission</property>
+                                                    <property name="title">ro (read only)</property>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="AdwSpinRow" id="opt_serveralive_row">
+                                                    <property name="adjustment">
+                                                      <object class="GtkAdjustment" id="serveralive_adjustment">
+                                                        <property name="lower">0</property>
+                                                        <property name="page-increment">10</property>
+                                                        <property name="step-increment">1</property>
+                                                        <property name="upper">300</property>
+                                                        <property name="value">15</property>
+                                                      </object>
+                                                    </property>
+                                                    <property name="subtitle">0 = disabled</property>
+                                                    <property name="title">ServerAliveInterval (sn)</property>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="AdwComboRow" id="opt_cache_row">
+                                                    <property name="model">
+                                                      <object class="GtkStringList" id="cache_options">
+                                                        <items>
+                                                          <item>yes</item>
+                                                          <item>no</item>
+                                                        </items>
+                                                      </object>
+                                                    </property>
+                                                    <property name="title">cache</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkButton" id="connect_button">
+                                                <property name="halign">end</property>
+                                                <property name="label">Connect</property>
+                                                <property name="margin-top">6</property>
+                                                <style>
+                                                  <class name="suggested-action"/>
+                                                  <class name="pill"/>
+                                                </style>
+                                              </object>
+                                            </child>
                                           </object>
-                                        </child>
+                                        </property>
+                                        <property name="name">form_page</property>
                                       </object>
                                     </child>
                                     <child>
-                                      <object class="GtkButton" id="connect_button">
-                                        <property name="halign">end</property>
-                                        <property name="label">Connect</property>
-                                        <property name="margin-top">6</property>
-                                        <style>
-                                          <class name="suggested-action"/>
-                                          <class name="pill"/>
-                                        </style>
+                                      <object class="GtkStackPage" id="info_page">
+                                        <property name="child">
+                                          <object class="GtkBox" id="info_box">
+                                            <property name="margin-bottom">24</property>
+                                            <property name="margin-end">12</property>
+                                            <property name="margin-start">12</property>
+                                            <property name="margin-top">24</property>
+                                            <property name="orientation">vertical</property>
+                                            <property name="spacing">18</property>
+                                            <child>
+                                              <object class="AdwPreferencesGroup" id="mount_info_group">
+                                                <property name="description">Details of the currently mounted SSHFS folder</property>
+                                                <property name="title">Mount Information</property>
+                                                <child>
+                                                  <object class="AdwActionRow" id="connection_type_row">
+                                                    <property name="subtitle">-</property>
+                                                    <property name="subtitle-selectable">true</property>
+                                                    <property name="title">Connection Type</property>
+                                                    <style>
+                                                      <class name="property"/>
+                                                    </style>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="AdwActionRow" id="remote_source_row">
+                                                    <property name="subtitle">-</property>
+                                                    <property name="subtitle-lines">0</property>
+                                                    <property name="subtitle-selectable">true</property>
+                                                    <property name="title">Remote Source</property>
+                                                    <style>
+                                                      <class name="property"/>
+                                                    </style>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="AdwActionRow" id="local_mount_point_row">
+                                                    <property name="subtitle">-</property>
+                                                    <property name="subtitle-lines">0</property>
+                                                    <property name="subtitle-selectable">true</property>
+                                                    <property name="title">Local Mount Point</property>
+                                                    <style>
+                                                      <class name="property"/>
+                                                    </style>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="AdwActionRow" id="options_row">
+                                                    <property name="subtitle">-</property>
+                                                    <property name="subtitle-lines">0</property>
+                                                    <property name="subtitle-selectable">true</property>
+                                                    <property name="title">Options</property>
+                                                    <style>
+                                                      <class name="property"/>
+                                                    </style>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="AdwPreferencesGroup" id="disk_usage_group">
+                                                <property name="title">Disk Usage</property>
+                                                <child>
+                                                  <object class="AdwActionRow" id="total_size_row">
+                                                    <property name="subtitle">-</property>
+                                                    <property name="subtitle-selectable">true</property>
+                                                    <property name="title">Total Size</property>
+                                                    <style>
+                                                      <class name="property"/>
+                                                    </style>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="AdwActionRow" id="used_size_row">
+                                                    <property name="subtitle">-</property>
+                                                    <property name="subtitle-selectable">true</property>
+                                                    <property name="title">Used Space</property>
+                                                    <style>
+                                                      <class name="property"/>
+                                                    </style>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="AdwActionRow" id="free_space_row">
+                                                    <property name="subtitle">-</property>
+                                                    <property name="subtitle-selectable">true</property>
+                                                    <property name="title">Free Space</property>
+                                                    <style>
+                                                      <class name="property"/>
+                                                    </style>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="GtkLevelBar" id="disk_usage_levelbar">
+                                                    <property name="margin-top">12</property>
+                                                    <property name="max-value">1</property>
+                                                    <property name="min-value">0</property>
+                                                    <property name="value">0</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </property>
+                                        <property name="name">info_page</property>
                                       </object>
                                     </child>
                                   </object>
