@@ -2,7 +2,7 @@ import gi
 gi.require_version("Adw", "1")
 
 from gi.repository import Adw
-from window import MainWindow
+from sshfs_gui.window import MainWindow
 
 class SSHFSApplication(Adw.Application):
     def __init__(self):

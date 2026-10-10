@@ -3,13 +3,14 @@ gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 
 import threading
+import os
 from gi.repository import Gtk, Gdk, GLib
-from handler import Handler
+from sshfs_gui.handler import Handler
 
 
 class MainWindow:
     def __init__(self, application):
-        ui_file = os.path.dirname(os.path.abspath(__file__)) + "/../ui/mainwindow.ui"  # interface file
+        ui_file = "/usr/share/sshfs-gui/ui/mainwindow.ui"  # interface file
         builder = Gtk.Builder.new_from_file(ui_file)
         self.builder = builder
 
