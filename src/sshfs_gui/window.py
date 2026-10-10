@@ -9,7 +9,8 @@ from handler import Handler
 
 class MainWindow:
     def __init__(self, application):
-        builder = Gtk.Builder.new_from_file("ui/mainwindow.ui")
+        ui_file = os.path.dirname(os.path.abspath(__file__)) + "/../ui/mainwindow.ui"  # interface file
+        builder = Gtk.Builder.new_from_file(ui_file)
         self.builder = builder
 
         self.window = builder.get_object("main_window")
