@@ -551,7 +551,7 @@
     <property name="width-request">640</property>
   </object>
   <object class="AdwAboutDialog" id="about_dialog">
-    <property name="application-icon">folder-remote-symbolic</property>
+    <property name="application-icon">sshfs-gui-256x256</property>
     <property name="application-name">SSHFS GUI</property>
     <property name="comments">Local/Remote SSH Folder Mounting Tool</property>
     <property name="license-type">gpl-3-0</property>
