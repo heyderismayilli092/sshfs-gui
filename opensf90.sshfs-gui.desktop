@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=sshfs-gui
+Comment=Connect folders on the remote server to your computer
+Comment[az]=Uzaq serverdəki qovluqları komputerinizə qoşun
+Comment[tr]=Uzak sunucudaki klasörleri bilgisayarınıza bağlayın
+Exec=sshfs-gui
+Icon=/usr/share/icons/hicolor/scalable/apps/sshfs-gui-256x256.png
+Terminal=false
+Type=Application
+Categories=System;
+StartupNotify=true
+Keywords=python;ssh;network;Network;RemoteAccess;
