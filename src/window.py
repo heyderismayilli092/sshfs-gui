@@ -3,7 +3,7 @@ gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 
 import threading
-from gi.repository import Gtk, GLib
+from gi.repository import Gtk, Gdk, GLib
 from handler import Handler
 
 
@@ -14,6 +14,32 @@ class MainWindow:
 
         self.window = builder.get_object("main_window")
         self.window.set_application(application)
+
+        self.css_code = """
+.success {
+    color: #2ec27e;
+    font-weight: bold;
+}
+.progress {
+    color: #0999f2;
+    font-weight: bold;
+}
+.error {
+    color: #e01b24;
+    font-weight: bold;
+}
+.black {
+    color: #000;
+    font-weight: bold;
+}
+        """
+        self.css_provider = Gtk.CssProvider()
+        self.css_provider.load_from_data(self.css_code.encode('utf-8'))
+
+        # CSS is being applied globally
+        self.display = Gdk.Display.get_default()
+        if self.display:
+            Gtk.StyleContext.add_provider_for_display(self.display, self.css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
         # elements
         self.scan_button = builder.get_object("scan_button")
@@ -49,6 +75,7 @@ class MainWindow:
         self.used_size_row = builder.get_object("used_size_row")
         self.free_space_row = builder.get_object("free_space_row")
         self.disk_usage_levelbar = builder.get_object("disk_usage_levelbar")
+        self.back_connpage = builder.get_object("back_connpage")
 
         self.handler = Handler(self)  # handler
         # signals
@@ -57,6 +84,7 @@ class MainWindow:
         self.sshdeviceslist_button.connect("clicked", self.on_sshdeviceslist_page)
         self.browse_local_folder_button.connect("clicked", self.on_select_directory)
         self.connect_button.connect("clicked", self.on_connect)
+        self.back_connpage.connect("clicked", self.on_back_connpage)
         self.opt_reconnect_row.connect("notify::active", self.on_opt_reconnect_row)
         self.opt_allow_other_row.connect("notify::active", self.on_opt_allow_other_row)
         self.opt_compression_row.connect("notify::active", self.on_opt_compression_row)
@@ -79,6 +107,13 @@ class MainWindow:
         self.window.present()
 
 
+    # objects CSS style update
+    def css_update(self, obj, style):
+        obj.set_css_classes([])
+        obj.add_css_class(style)
+        return True
+
+
     # ssh devices scan progress
     def on_scan_clicked(self, button):
         print("Scanning SSH devices...")
@@ -87,6 +122,7 @@ class MainWindow:
         self.sshdeviceslist_button.set_sensitive(False)
         self.scan_button.set_sensitive(False)
         self.connectedfolders_button.set_sensitive(False)
+        self.connect_button.set_sensitive(False)
         sshscan_thread = threading.Thread(target=self.scan_worker, daemon=True)
         sshscan_thread.start()
         return False
@@ -99,6 +135,7 @@ class MainWindow:
         self.sshdeviceslist_button.set_sensitive(True)
         self.scan_button.set_sensitive(True)
         self.connectedfolders_button.set_sensitive(True)
+        self.connect_button.set_sensitive(True)
         print("Devices: ", addresslist)
         if addresslist:
             for lst in addresslist:
@@ -169,6 +206,7 @@ class MainWindow:
                 if path:
                     self.bind_folder = path
                     print("Selected bind folder:", self.bind_folder)
+                    self.css_update(self.connstatus_label, "black")
                     self.connstatus_label.set_text("Selected bind folder: '"+self.bind_folder+"'")
         # close the dialog via the main loop
         GLib.idle_add(lambda: (dialog.destroy(), setattr(self, "_req_dialog", None))[0])
@@ -184,52 +222,62 @@ class MainWindow:
         # ip address check
         if not hostipaddr:
             print("Enter a host ip address !")
+            self.css_update(self.connstatus_label, "error")
             self.connstatus_label.set_text("Enter a host ip address !")
             return False
         else:
             checkip = self.handler.ipaddr_check(hostipaddr)
             if not checkip:
                 print("Enter a valid IP address!")
+                self.css_update(self.connstatus_label, "error")
                 self.connstatus_label.set_text("Enter a valid IP address!")
                 return False
         # port number check
         if not portnumber:
             print("Enter a port number !")
+            self.css_update(self.connstatus_label, "error")
             self.connstatus_label.set_text("Enter a port number !")
             return False
         else:
             if int(portnumber) > 65535:
                 print("Enter the correct port number !")
+                self.css_update(self.connstatus_label, "error")
                 self.connstatus_label.set_text("Enter the correct port number !")
                 return False
         # username check
         if not username:
             print("Enter a username !")
+            self.css_update(self.connstatus_label, "error")
             self.connstatus_label.set_text("Enter a username !")
             return False
         # password check
         if not username:
             print("Enter a password !")
+            self.css_update(self.connstatus_label, "error")
             self.connstatus_label.set_text("Enter a password !")
             return False
         # check bind folder select
         if not self.bind_folder:
             print("Select the folder to be linked from the computer !")
+            self.css_update(self.connstatus_label, "error")
             self.connstatus_label.set_text("Select the folder to be linked from the computer !")
             return False
         else:
             checkfolder = self.handler.bindfolder_check(self.bind_folder)
             if not checkfolder:
                 print(checkfolder[1])
+                self.css_update(self.connstatus_label, "error")
                 self.connstatus_label.set_text(checkfolder[1])
                 return False
         # remote path check
         if not remotepath:
             print("Enter the folder path on the remote side !")
+            self.css_update(self.connstatus_label, "error")
             self.connstatus_label.set_text("Enter the folder path on the remote side !")
             return False
 
         print("Connecting...")
+        self.css_update(self.connstatus_label, "progress")
         self.connstatus_label.set_text("Connecting...")
         serveralive_num = self.opt_serveralive_row.get_value()
         if int(serveralive_num) != 0:
@@ -247,11 +295,13 @@ class MainWindow:
     def connected_finished(self, output):
         if output == True:
             print("Connected successfully !")
+            self.css_update(self.connstatus_label, "success")
             self.connstatus_label.set_text("Connected successfully !")
             return False
         else:
             errormsj = output[1]
             print("Error: "+errormsj)
+            self.css_update(self.connstatus_label, "error")
             self.connstatus_label.set_text("Error: "+errormsj)
             return False
     # ------
@@ -305,6 +355,7 @@ class MainWindow:
         else:
             self.connection_stack.set_visible_child_name("conn_page")
             print("The information for the mounted folder could not be displayed !")
+            self.css_update(self.connstatus_label, "error")
             self.connstatus_label.set_text("The information for the mounted folder could not be displayed !")
         return False
     # ------
@@ -323,14 +374,23 @@ class MainWindow:
     def unmount_finished(self, output, mountpath):
         if output:
             print(f"'{mountpath}' unmount successfully")
+            self.css_update(self.connstatus_label, "success")
             self.connstatus_label.set_text(f"'{mountpath}' unmount successfully")
         else:
             print(f"'{mountpath}' unmount progress failed !")
+            self.css_update(self.connstatus_label, "error")
             self.connstatus_label.set_text(f"'{mountpath}' unmount progress failed !")
         self.connection_stack.set_visible_child_name("conn_page")
         self.disconnect_button.set_sensitive(False)
         return False
     # ------
+
+
+    # back connection page
+    def on_back_connpage(self, button):
+        self.disconnect_button.set_sensitive(False)
+        self.connection_stack.set_visible_child_name("conn_page")
+        return False
 
 
     # function(s) that create objects for GtkListBox rows
