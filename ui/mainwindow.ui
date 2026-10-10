@@ -12,15 +12,14 @@
           <object class="AdwToolbarView" id="toolbar_view">
             <property name="content">
               <object class="GtkOverlay" id="main_overlay">
-                <!-- ANA İÇERİK -->
                 <property name="child">
                   <object class="GtkBox" id="root_box">
                     <property name="orientation">vertical</property>
                     <child>
                       <object class="AdwBanner" id="error_banner">
-                        <property name="button-label">Kapat</property>
+                        <property name="button-label">Close</property>
                         <property name="revealed">false</property>
-                        <property name="title">Bir hata oluştu.</property>
+                        <property name="title">An error occurred.</property>
                       </object>
                     </child>
                     <child>
@@ -144,7 +143,7 @@
                                                   <object class="GtkScrolledWindow" id="connected_folders_scrolled">
                                                     <property name="child">
                                                       <object class="GtkListBox" id="connected_folders_listbox">
-                                                        <property name="selection-mode">single</property>
+                                                        <property name="selection-mode">none</property>
                                                         <style>
                                                           <class name="navigation-sidebar"/>
                                                         </style>
@@ -248,7 +247,7 @@
                                     <property name="transition-type">crossfade</property>
                                     <property name="visible-child-name">form_page</property>
                                     <child>
-                                      <object class="GtkStackPage" id="form_page">
+                                      <object class="GtkStackPage" id="conn_page">
                                         <property name="child">
                                           <object class="GtkBox" id="form_box">
                                             <property name="margin-bottom">24</property>
@@ -380,7 +379,7 @@
                                             </child>
                                           </object>
                                         </property>
-                                        <property name="name">form_page</property>
+                                        <property name="name">conn_page</property>
                                       </object>
                                     </child>
                                     <child>
@@ -485,6 +484,12 @@
                                                 </child>
                                               </object>
                                             </child>
+                                            <child>
+                                              <object class="GtkButton" id="back_connpage">
+                                                <property name="halign">start</property>
+                                                <property name="label">Back</property>
+                                              </object>
+                                            </child>
                                           </object>
                                         </property>
                                         <property name="name">info_page</property>
@@ -515,6 +520,12 @@
                   </object>
                 </property>
                 <child type="start">
+                  <object class="GtkButton" id="about_button">
+                    <property name="icon-name">help-about-symbolic</property>
+                    <property name="tooltip-text">About</property>
+                  </object>
+                </child>
+                <child type="start">
                   <object class="GtkButton" id="scan_button">
                     <property name="icon-name">view-refresh-symbolic</property>
                     <property name="tooltip-text">Scan the SSH devices on the network</property>
@@ -538,5 +549,12 @@
     <property name="height-request">440</property>
     <property name="title">SSHFS GUI</property>
     <property name="width-request">640</property>
+  </object>
+  <object class="AdwAboutDialog" id="about_dialog">
+    <property name="application-icon">folder-remote-symbolic</property>
+    <property name="application-name">SSHFS GUI</property>
+    <property name="comments">Local/Remote SSH Folder Mounting Tool</property>
+    <property name="license-type">gpl-3-0</property>
+    <property name="version">1.0.0</property>
   </object>
 </interface>
