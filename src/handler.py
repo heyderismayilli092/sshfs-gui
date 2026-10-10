@@ -1,7 +1,6 @@
 import os
 import subprocess
 import socket
-import re
 import ipaddress
 import time
 
