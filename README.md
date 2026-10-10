@@ -1,3 +1,7 @@
+<p align="center" width="100%">
+  <img src="https://github.com/heyderismayilli092/sshfs-gui/blob/main/sshfs-gui-256x256.png" width="40%" alt="sshfs-gui">
+</p>
+
 # SSHFS GUI
 **A modern GTK4 and libadwaita graphical interface for SSHFS on Linux.**
 
