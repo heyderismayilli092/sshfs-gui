@@ -15,6 +15,7 @@ class MainWindow:
         self.window = builder.get_object("main_window")
         self.window.set_application(application)
 
+        # CSS style
         self.css_code = """
 .success {
     color: #2ec27e;
@@ -45,6 +46,7 @@ class MainWindow:
         self.scan_button = builder.get_object("scan_button")
         self.connect_button = builder.get_object("connect_button")
         self.disconnect_button = builder.get_object("disconnect_button")
+        self.about_button = builder.get_object("about_button")
         self.device_listbox = builder.get_object("device_listbox")
         self.connected_folders_listbox = builder.get_object("connected_folders_listbox")
         self.host_entry = builder.get_object("host_entry_row")
@@ -77,6 +79,9 @@ class MainWindow:
         self.disk_usage_levelbar = builder.get_object("disk_usage_levelbar")
         self.back_connpage = builder.get_object("back_connpage")
 
+        # About Dialog
+        self.about_dialog = builder.get_object("about_dialog")
+
         self.handler = Handler(self)  # handler
         # signals
         self.scan_button.connect("clicked", self.on_scan_clicked)
@@ -85,6 +90,7 @@ class MainWindow:
         self.browse_local_folder_button.connect("clicked", self.on_select_directory)
         self.connect_button.connect("clicked", self.on_connect)
         self.back_connpage.connect("clicked", self.on_back_connpage)
+        self.about_button.connect("clicked", self.on_about)
         self.opt_reconnect_row.connect("notify::active", self.on_opt_reconnect_row)
         self.opt_allow_other_row.connect("notify::active", self.on_opt_allow_other_row)
         self.opt_compression_row.connect("notify::active", self.on_opt_compression_row)
@@ -392,6 +398,11 @@ class MainWindow:
         self.connection_stack.set_visible_child_name("conn_page")
         return False
 
+
+    # about window
+    def on_about(self, button):
+        self.about_dialog.present()
+        return False
 
     # function(s) that create objects for GtkListBox rows
     # enables the listing of discovered SSH devices
