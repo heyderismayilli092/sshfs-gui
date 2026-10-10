@@ -8,5 +8,5 @@ Homepage: https://github.com/heyderismayilli092/sshfs-gui
 
 Package: sshfs-gui
 Architecture: all
-Depends: libgtk-4-dev, gir1.2-gtk-4.0, python3-gi, python3-venv
+Depends: libgtk-4-dev, gir1.2-gtk-4.0, python3-gi
 Description: A GTK4-based tool that allows you to mount files from your local network or a remote server to your computer using 'sshfs'
