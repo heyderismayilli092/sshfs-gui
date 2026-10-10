@@ -1,0 +1,4 @@
+ui/mainwindow.ui /usr/share/sshfs-gui/ui
+opensf90.sshfs-gui.desktop /usr/share/applications
+sshfs-gui-64x64.png /usr/share/icons/hicolor/scalable/apps/
+sshfs-gui-256x256.png /usr/share/icons/hicolor/scalable/apps/
